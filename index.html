@@ -1,35 +1,416 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css"> 
-    <title>Calculatrice</title>
+    <title>Calculatrice Graphique TI-84 Plus CE NextGen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
 </head>
-
-
 <body>
-    
-    <div class="app">
-        <h3 id="result"></h3>
-        <button class="btn" id="9">9</button>
-        <button class="btn" id="8">8</button>
-        <button class="btn" id="7">7</button>
-        <button class="btn" id="6">6</button>
-        <button class="btn" id="5">5</button>
-        <button class="btn" id="4">4</button>
-        <button class="btn" id="3">3</button>
-        <button class="btn" id="2">2</button>
-        <button class="btn" id="1">1</button>
-        <button class="btn" id="0">0</button>
-        <button class="btn" id=".">.</button>
-        <button class="btn" id="+">+</button>
-        <button class="btn" id="-">-</button>
-        <button  id="equal">=</button>
-        <button class="btn" id="*">*</button>
-        <button class="btn" id="/">/</button>
-        <button  id="clear">C</button>
+    <div class="main-wrapper">
+        <!-- Floating Ambient Glow -->
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+
+        <!-- Calculator Chassis -->
+        <div class="ti-calculator" id="calculator">
+            
+            <!-- Top Branding Header -->
+            <div class="ti-header">
+                <div class="ti-brand">
+                    <span class="ti-logo">TEXAS INSTRUMENTS</span>
+                    <span class="ti-model">TI-84 Plus CE <span class="edition-badge">Python Edition</span></span>
+                </div>
+                <div class="ti-header-actions">
+                    <button class="sound-toggle-btn" id="soundToggle" title="Activer / Désactiver les sons de touche">
+                        <span class="icon" id="soundIcon">🔊</span>
+                    </button>
+                    <div class="status-led" id="powerLed" title="En fonction"></div>
+                </div>
+            </div>
+
+            <!-- Screen Unit (Color LCD Display) -->
+            <div class="screen-bezel">
+                <div class="screen-glare"></div>
+                
+                <!-- Status Top Bar (TI standard) -->
+                <div class="screen-status-bar">
+                    <div class="status-left">
+                        <span class="badge" id="badgeSecond">2nd</span>
+                        <span class="badge" id="badgeAlpha">A</span>
+                        <button class="status-pill-btn" id="btnToggleAngle" title="Changer l'unité d'angle">
+                            <span id="angleModeDisplay">DEG</span>
+                        </button>
+                        <span class="status-item">NORMAL</span>
+                        <span class="status-item">FLOTT</span>
+                        <span class="status-item">RÉEL</span>
+                    </div>
+                    <div class="status-right">
+                        <span class="screen-mode-pill" id="screenModeLabel">CALC</span>
+                        <div class="battery-meter" title="Batterie 98%">
+                            <div class="battery-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen Body Container -->
+                <div class="screen-body">
+                    <!-- Standard Calc View -->
+                    <div class="view-panel calc-view active" id="calcView">
+                        <div class="history-scroll" id="historyList">
+                            <div class="history-welcome">
+                                <div class="welcome-title">TI-84 Plus CE NextGen</div>
+                                <div class="welcome-sub">Prêt pour calculs & fonctions graphiques</div>
+                            </div>
+                        </div>
+                        
+                        <div class="active-entry-container">
+                            <div class="prompt-symbol">▶</div>
+                            <div class="expression-input" id="expressionDisplay"></div>
+                            <div class="cursor" id="cursor"></div>
+                        </div>
+
+                        <div class="realtime-preview" id="realtimePreview"></div>
+                    </div>
+
+                    <!-- Graphing Screen View -->
+                    <div class="view-panel graph-view" id="graphView">
+                        <div class="graph-top-bar">
+                            <span class="graph-fn-label" id="activeGraphFnDisplay">Y1 = sin(X)</span>
+                            <div class="graph-controls">
+                                <button class="graph-zoom-btn" id="graphZoomIn" title="Zoom +">+</button>
+                                <button class="graph-zoom-btn" id="graphZoomOut" title="Zoom -">−</button>
+                                <button class="graph-zoom-btn" id="graphReset" title="Réinitialiser standard">STD</button>
+                            </div>
+                        </div>
+                        <canvas id="graphCanvas" width="340" height="175"></canvas>
+                        <div class="graph-coord-bar" id="graphCoords">X: 0.00 | Y: 0.00</div>
+                    </div>
+
+                    <!-- Function / Y= Editor View -->
+                    <div class="view-panel fns-view" id="fnsView">
+                        <div class="fns-title">FONCTION GRAPHIQUE [Y=]</div>
+                        <div class="fn-row">
+                            <span class="fn-name">Y₁=</span>
+                            <input type="text" class="fn-input" id="inputY1" value="sin(X)" placeholder="Ex: sin(X), X^2 - 4">
+                        </div>
+                        <div class="fn-row">
+                            <span class="fn-name">Y₂=</span>
+                            <input type="text" class="fn-input" id="inputY2" value="cos(X)" placeholder="Ex: 0.5*X + 1">
+                        </div>
+                        <div class="fns-helper">
+                            Appuyez sur <span class="key-badge">GRAPH</span> pour tracer.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Softkeys Row (F1 - F5 / Y=, WINDOW, ZOOM, TRACE, GRAPH) -->
+            <div class="softkeys-row">
+                <button class="key softkey" id="k-yequals" data-action="view-fns">
+                    <span class="label-second">f1</span>
+                    <span class="label-main">Y=</span>
+                </button>
+                <button class="key softkey" id="k-window" data-action="view-window">
+                    <span class="label-second">f2</span>
+                    <span class="label-main">FENÊTRE</span>
+                </button>
+                <button class="key softkey" id="k-zoom" data-action="view-zoom">
+                    <span class="label-second">f3</span>
+                    <span class="label-main">ZOOM</span>
+                </button>
+                <button class="key softkey" id="k-trace" data-action="view-trace">
+                    <span class="label-second">f4</span>
+                    <span class="label-main">TRACE</span>
+                </button>
+                <button class="key softkey key-graph" id="k-graph" data-action="toggle-graph">
+                    <span class="label-second">f5</span>
+                    <span class="label-main">GRAPHE</span>
+                </button>
+            </div>
+
+            <!-- EXCLUSIVE SECTION: TOUCHES CUSTOM (Customizable Keys Bar) -->
+            <div class="custom-keys-section">
+                <div class="custom-keys-header">
+                    <span class="custom-label">⚡ TOUCHES CUSTOMISABLES</span>
+                    <button class="btn-config-custom" id="btnOpenCustomModal" title="Personnaliser les touches custom">
+                        ⚙️ CONFIG
+                    </button>
+                </div>
+                <div class="custom-keys-grid">
+                    <button class="key custom-key" id="customKey1" data-custom-index="0">
+                        <span class="custom-index">C1</span>
+                        <span class="custom-name" id="c1-name">TVA 20%</span>
+                    </button>
+                    <button class="key custom-key" id="customKey2" data-custom-index="1">
+                        <span class="custom-index">C2</span>
+                        <span class="custom-name" id="c2-name">Pythagore</span>
+                    </button>
+                    <button class="key custom-key" id="customKey3" data-custom-index="2">
+                        <span class="custom-index">C3</span>
+                        <span class="custom-name" id="c3-name">Δ (b²-4ac)</span>
+                    </button>
+                    <button class="key custom-key" id="customKey4" data-custom-index="3">
+                        <span class="custom-index">C4</span>
+                        <span class="custom-name" id="c4-name">Nombre d'Or</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Primary Control & D-Pad Section -->
+            <div class="controls-dpad-section">
+                <div class="controls-left">
+                    <div class="control-row">
+                        <button class="key key-second" id="k-second" data-action="toggle-second">
+                            <span class="label-main">2nd</span>
+                        </button>
+                        <button class="key key-mode" id="k-mode" data-action="toggle-angle">
+                            <span class="label-second">QUITTER</span>
+                            <span class="label-main">MODE</span>
+                        </button>
+                        <button class="key key-del" id="k-del" data-action="del">
+                            <span class="label-second">INS</span>
+                            <span class="label-main">SUPPR</span>
+                        </button>
+                    </div>
+                    <div class="control-row">
+                        <button class="key key-alpha" id="k-alpha" data-action="toggle-alpha">
+                            <span class="label-second">A-VERR</span>
+                            <span class="label-main">ALPHA</span>
+                        </button>
+                        <button class="key key-function" id="k-x" data-insert="X" data-alpha="X">
+                            <span class="label-second">Lien</span>
+                            <span class="label-main">X,T,θ,n</span>
+                        </button>
+                        <button class="key key-function" id="k-stat" data-insert="fact(" data-alpha="Y">
+                            <span class="label-second">LISTE</span>
+                            <span class="label-main">STAT</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Circular Navigation D-PAD -->
+                <div class="dpad-container">
+                    <button class="dpad-btn dpad-up" id="dpadUp" data-action="arrow-up" title="Haut / Historique">▲</button>
+                    <button class="dpad-btn dpad-left" id="dpadLeft" data-action="arrow-left" title="Gauche">◀</button>
+                    <div class="dpad-center"></div>
+                    <button class="dpad-btn dpad-right" id="dpadRight" data-action="arrow-right" title="Droite">▶</button>
+                    <button class="dpad-btn dpad-down" id="dpadDown" data-action="arrow-down" title="Bas / Historique">▼</button>
+                </div>
+            </div>
+
+            <!-- Mathematical Keypad Matrix -->
+            <div class="math-matrix">
+                <!-- Row 1: MATH, APPS, PRGM, VARS, CLEAR -->
+                <button class="key key-function" id="k-math" data-insert="abs(" data-second="cbrt(" data-alpha="A">
+                    <span class="label-second">∛</span>
+                    <span class="label-alpha">A</span>
+                    <span class="label-main">MATH</span>
+                </button>
+                <button class="key key-function" id="k-apps" data-insert="%" data-second="angle" data-alpha="B">
+                    <span class="label-second">ANGLE</span>
+                    <span class="label-alpha">B</span>
+                    <span class="label-main">APPS</span>
+                </button>
+                <button class="key key-function" id="k-prgm" data-insert="rand()" data-second="tirage" data-alpha="C">
+                    <span class="label-second">ALEA</span>
+                    <span class="label-alpha">C</span>
+                    <span class="label-main">PRGM</span>
+                </button>
+                <button class="key key-function" id="k-vars" data-action="insert-ans" data-second="DISTRIB" data-alpha="D">
+                    <span class="label-second">REP</span>
+                    <span class="label-alpha">D</span>
+                    <span class="label-main">VARS</span>
+                </button>
+                <button class="key key-clear" id="k-clear" data-action="clear">
+                    <span class="label-main">ANNUL</span>
+                </button>
+
+                <!-- Row 2: x^-1, sin, cos, tan, ^ -->
+                <button class="key key-function" id="k-inv" data-insert="^(-1)" data-second="matrix" data-alpha="D">
+                    <span class="label-second">MATRX</span>
+                    <span class="label-alpha">E</span>
+                    <span class="label-main">x⁻¹</span>
+                </button>
+                <button class="key key-trig" id="k-sin" data-insert="sin(" data-second="asin(" data-alpha="E">
+                    <span class="label-second">sin⁻¹</span>
+                    <span class="label-alpha">F</span>
+                    <span class="label-main">sin</span>
+                </button>
+                <button class="key key-trig" id="k-cos" data-insert="cos(" data-second="acos(" data-alpha="F">
+                    <span class="label-second">cos⁻¹</span>
+                    <span class="label-alpha">G</span>
+                    <span class="label-main">cos</span>
+                </button>
+                <button class="key key-trig" id="k-tan" data-insert="tan(" data-second="atan(" data-alpha="G">
+                    <span class="label-second">tan⁻¹</span>
+                    <span class="label-alpha">H</span>
+                    <span class="label-main">tan</span>
+                </button>
+                <button class="key key-function" id="k-power" data-insert="^" data-second="root" data-alpha="H">
+                    <span class="label-second">ˣ√</span>
+                    <span class="label-alpha">I</span>
+                    <span class="label-main">^</span>
+                </button>
+
+                <!-- Row 3: x^2, comma, (, ), div -->
+                <button class="key key-function" id="k-square" data-insert="^2" data-second="sqrt(" data-alpha="I">
+                    <span class="label-second">√</span>
+                    <span class="label-alpha">J</span>
+                    <span class="label-main">x²</span>
+                </button>
+                <button class="key key-function" id="k-comma" data-insert="," data-second="EE" data-alpha="J">
+                    <span class="label-second">EE</span>
+                    <span class="label-alpha">K</span>
+                    <span class="label-main">,</span>
+                </button>
+                <button class="key key-function" id="k-lparen" data-insert="(" data-second="{" data-alpha="K">
+                    <span class="label-second">{</span>
+                    <span class="label-alpha">L</span>
+                    <span class="label-main">(</span>
+                </button>
+                <button class="key key-function" id="k-rparen" data-insert=")" data-second="}" data-alpha="L">
+                    <span class="label-second">}</span>
+                    <span class="label-alpha">M</span>
+                    <span class="label-main">)</span>
+                </button>
+                <button class="key key-operator" id="k-div" data-insert="/" data-second="e" data-alpha="e">
+                    <span class="label-second">e</span>
+                    <span class="label-main">÷</span>
+                </button>
+
+                <!-- Row 4: LOG, 7, 8, 9, mult -->
+                <button class="key key-function" id="k-log" data-insert="log(" data-second="10^(" data-alpha="M">
+                    <span class="label-second">10ˣ</span>
+                    <span class="label-alpha">N</span>
+                    <span class="label-main">log</span>
+                </button>
+                <button class="key key-num" id="k-7" data-insert="7" data-second="u" data-alpha="O">
+                    <span class="label-alpha">O</span>
+                    <span class="label-main">7</span>
+                </button>
+                <button class="key key-num" id="k-8" data-insert="8" data-second="v" data-alpha="P">
+                    <span class="label-alpha">P</span>
+                    <span class="label-main">8</span>
+                </button>
+                <button class="key key-num" id="k-9" data-insert="9" data-second="w" data-alpha="Q">
+                    <span class="label-alpha">Q</span>
+                    <span class="label-main">9</span>
+                </button>
+                <button class="key key-operator" id="k-mul" data-insert="*" data-second="[" data-alpha="R">
+                    <span class="label-second">[</span>
+                    <span class="label-alpha">R</span>
+                    <span class="label-main">×</span>
+                </button>
+
+                <!-- Row 5: LN, 4, 5, 6, minus -->
+                <button class="key key-function" id="k-ln" data-insert="ln(" data-second="e^(" data-alpha="S">
+                    <span class="label-second">eˣ</span>
+                    <span class="label-alpha">S</span>
+                    <span class="label-main">ln</span>
+                </button>
+                <button class="key key-num" id="k-4" data-insert="4" data-second="L4" data-alpha="T">
+                    <span class="label-alpha">T</span>
+                    <span class="label-main">4</span>
+                </button>
+                <button class="key key-num" id="k-5" data-insert="5" data-second="L5" data-alpha="U">
+                    <span class="label-alpha">U</span>
+                    <span class="label-main">5</span>
+                </button>
+                <button class="key key-num" id="k-6" data-insert="6" data-second="L6" data-alpha="V">
+                    <span class="label-alpha">V</span>
+                    <span class="label-main">6</span>
+                </button>
+                <button class="key key-operator" id="k-sub" data-insert="-" data-second="]" data-alpha="W">
+                    <span class="label-second">]</span>
+                    <span class="label-alpha">W</span>
+                    <span class="label-main">−</span>
+                </button>
+
+                <!-- Row 6: STO->, 1, 2, 3, plus -->
+                <button class="key key-function" id="k-sto" data-action="insert-pi" data-second="pi" data-alpha="X">
+                    <span class="label-second">π</span>
+                    <span class="label-alpha">X</span>
+                    <span class="label-main">sto➔</span>
+                </button>
+                <button class="key key-num" id="k-1" data-insert="1" data-second="L1" data-alpha="Y">
+                    <span class="label-alpha">Y</span>
+                    <span class="label-main">1</span>
+                </button>
+                <button class="key key-num" id="k-2" data-insert="2" data-second="L2" data-alpha="Z">
+                    <span class="label-alpha">Z</span>
+                    <span class="label-main">2</span>
+                </button>
+                <button class="key key-num" id="k-3" data-insert="3" data-second="L3" data-alpha="theta">
+                    <span class="label-alpha">θ</span>
+                    <span class="label-main">3</span>
+                </button>
+                <button class="key key-operator" id="k-add" data-insert="+" data-second="MEM" data-alpha='"'>
+                    <span class="label-second">MEM</span>
+                    <span class="label-alpha">"</span>
+                    <span class="label-main">+</span>
+                </button>
+
+                <!-- Row 7: ON, 0, dot, neg (-), ENTER -->
+                <button class="key key-on" id="k-on" data-action="reset">
+                    <span class="label-main">on</span>
+                </button>
+                <button class="key key-num" id="k-0" data-insert="0" data-second="catalog" data-alpha="_">
+                    <span class="label-second">CATAL</span>
+                    <span class="label-alpha">_</span>
+                    <span class="label-main">0</span>
+                </button>
+                <button class="key key-num" id="k-dot" data-insert="." data-second="i" data-alpha=":">
+                    <span class="label-second">i</span>
+                    <span class="label-alpha">:</span>
+                    <span class="label-main">.</span>
+                </button>
+                <button class="key key-num" id="k-neg" data-insert="-" data-second="ans" data-alpha="?">
+                    <span class="label-second">rép</span>
+                    <span class="label-alpha">?</span>
+                    <span class="label-main">(-)</span>
+                </button>
+                <button class="key key-enter" id="k-enter" data-action="evaluate">
+                    <span class="label-second">ENTRÉE</span>
+                    <span class="label-main">entrer</span>
+                </button>
+            </div>
+
+            <!-- Footer Badge -->
+            <div class="ti-footer">
+                <span>TEXAS INSTRUMENTS TI-84 Plus CE • PYTHON EDITION</span>
+            </div>
+        </div>
+
+        <!-- Interactive Configuration Modal for Custom Keys -->
+        <div class="custom-modal-overlay" id="customModal">
+            <div class="custom-modal-content">
+                <div class="modal-header">
+                    <h3>⚡ Configuration des Touches Custom</h3>
+                    <button class="modal-close-btn" id="btnCloseCustomModal">✕</button>
+                </div>
+                <p class="modal-intro">Personnalisez vos 4 touches d'accès rapide. Vous pouvez affecter des formules complètes, des constantes ou des macros calculées avec la réponse précédente (<code>Ans</code>) ou la variable (<code>X</code>).</p>
+                
+                <div class="custom-items-list" id="customConfigList">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <div class="modal-presets">
+                    <span class="presets-label">Préréglages rapides :</span>
+                    <button class="preset-pill" data-preset="finance">Finance / TVA</button>
+                    <button class="preset-pill" data-preset="maths">Géométrie & Algèbre</button>
+                    <button class="preset-pill" data-preset="physics">Constantes Physiques</button>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-modal-cancel" id="btnCancelCustom">Annuler</button>
+                    <button class="btn-modal-save" id="btnSaveCustom">Enregistrer les Touches</button>
+                </div>
+            </div>
+        </div>
 
     </div>
 
